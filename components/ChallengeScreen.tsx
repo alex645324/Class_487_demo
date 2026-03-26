@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { challengeEnvironments, getReflection } from "@/lib/data";
+import { saveUserData } from "@/lib/storage";
 
 interface Props {
   onComplete: () => void;
@@ -22,6 +23,10 @@ export default function ChallengeScreen({ onComplete }: Props) {
   const handleSubmit = () => {
     if (selections.length === 0) return;
     setShowReflection(true);
+
+    //saves the selection choices made by users to storage
+    saveUserData({ challengeSelections: selections})
+    console.log("[Challenge] Saved Selections", selections);
   };
 
   return (
