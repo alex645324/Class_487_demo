@@ -1,6 +1,5 @@
 // Mock login screen that simulates Penn State SSO authentication
 // Real implementation would redirect to Microsoft Azure AD, plan on registering for that soon
-
 "use client";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -36,7 +35,7 @@ export default function LoginScreen({ onLogin }: Props) {
     }, 1500);
   };
 
-  // 3. Handle form submission (fallback for manual entry)
+  // Handle form submission (fallback for manual entry)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -52,17 +51,13 @@ export default function LoginScreen({ onLogin }: Props) {
       return;
     }
 
-    // In a real implementation, this would send credentials to the backend.
-    // For demo, we just simulate success.
+    // In a real implementation, this would send credentials to the backend
     simulateAuth(email);
   };
 
-  // 4. Mock SSO button – simulates redirect to Penn State's identity provider
+  // Mock SSO button – simulates how redirecting to Penn State's sso would work
   const handleSSORedirect = () => {
     console.log("[Login] Initiating Penn State SSO redirect (mock)");
-    // Real SSO would redirect to:
-    // https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/authorize...
-    // For demo, we simulate the callback.
     simulateAuth("demo@psu.edu");
   };
 
@@ -70,7 +65,7 @@ export default function LoginScreen({ onLogin }: Props) {
 
   return (
     <div className="min-h-dvh flex flex-col items-center justify-center bg-white px-6">
-      {/* 1. Penn State branding – blue circle with "PSU" */}
+      {/* Penn State branding */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -85,7 +80,7 @@ export default function LoginScreen({ onLogin }: Props) {
         </p>
       </motion.div>
 
-      {/* 2. Primary SSO button – Penn State blue */}
+      {/* SSO button – Blue to match penn states colors */}
       <motion.button
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -111,7 +106,7 @@ export default function LoginScreen({ onLogin }: Props) {
         <div className="flex-1 h-px bg-gray-200" />
       </div>
 
-      {/* 4. Manual login form (for demo only – real SSO wouldn't have this) */}
+      {/* Manual login form for demo, real SSO wouldn't need this) */}
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -152,8 +147,7 @@ export default function LoginScreen({ onLogin }: Props) {
           {isLoading ? "Signing in..." : "Sign In"}
         </motion.button>
       </form>
-
-      {/* 5. Helper text (explains mock nature) */}
+      {/* Mock explanation at bottom of login screen */}
       <p className="text-xs text-gray-400 text-center mt-8 max-w-sm">
         This is a demo mockup. Real implementation requires registering for Penn State Azure SSO.
         <br />

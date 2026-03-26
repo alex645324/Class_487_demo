@@ -19,7 +19,6 @@ export default function ChallengeScreen({ onComplete }: Props) {
       prev.includes(label) ? prev.filter((s) => s !== label) : [...prev, label]
     );
   };
-
   const handleSubmit = () => {
     if (selections.length === 0) return;
     setShowReflection(true);

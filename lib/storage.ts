@@ -1,15 +1,10 @@
-// lib/storage.ts
-// Handles saving and loading user data to localStorage.
-// Used to persist quiz answers, energy type, challenge selections, and user info.
-
+// Handles saving and loading the  user data to localStorage
+// Used to hold the quiz answers, energy type, challenge selections, and user info data
 import { EnergyType } from "./data";
 
-// ============================================================
-// My thought process:
-// I chose localStorage because it's simple, works without a backend,
-// and persists across page refreshes. For a demo, this is ideal.
-// In production, we'd replace this with a database and user authentication.
-// ============================================================
+// I chose to store the mock login info of users in localStorage because it's simple, and works without a backend
+// For a demo, this is ideal.
+// Later on, we will replace this with a database and user authentication
 
 export interface UserData {
   answers: EnergyType[];
@@ -24,13 +19,11 @@ export interface UserData {
   };
 }
 
-// I'm using a single key for all users because this is a demo.
-// In a real app, I'd use a key that includes the user's email to separate data.
+// I'm using a single key for all users because this is a demo
+// In a real app, I'd use a key that includes the user's email to separate data
 const STORAGE_KEY = "career-energy-user";
 
-// 1. Save user data (merges with existing)
-// This function merges new data with existing data instead of overwriting,
-// so we don't accidentally lose progress when saving only part of the user's info.
+// This function merges new data with existing data instead of overwriting so we don't accidentally lose progress when saving only part of the user's info
 export function saveUserData(data: Partial<UserData>) {
   console.log("[storage] Saving user data:", data);
   const existing = loadUserData();
@@ -38,9 +31,8 @@ export function saveUserData(data: Partial<UserData>) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 }
 
-// 2. Load user data from localStorage
-// If no data exists, return default values so the app doesn't crash.
-// This provides a clean starting point for new users.
+//Load user data from localStorage and if no data exists, return default values so the app doesn't crash
+// This provides a clean starting point for new users
 export function loadUserData(): UserData {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (!stored) {
@@ -58,8 +50,8 @@ export function loadUserData(): UserData {
   return parsed;
 }
 
-// 3. Calculate total points based on completed actions
-// Points are awarded for completing the quiz (100) and the challenge (50).
+// Calculate total points based on completed actions
+// Points are awarded for completing the quiz (100) and each challenges (50).
 // This is a simple gamification element that can be expanded later.
 export function calculatePoints(userData: UserData): number {
   let points = 0;
@@ -69,9 +61,7 @@ export function calculatePoints(userData: UserData): number {
   return points;
 }
 
-// 4. Award badges based on completed actions
-// Badges give visual recognition for milestones.
-// I used emoji-based badges to make them fun and engaging.
+// Awards users badges based on their completed tasks
 export function getBadges(userData: UserData): string[] {
   const badges: string[] = [];
   if (userData.answers.length > 0) badges.push("🎓 First Quiz");

@@ -38,7 +38,6 @@ export default function Home() {
     setScreen("opening");
     console.log("[Main] User logged in, starting Questionnaire:");
 };
-
   const handleQuizComplete = (answers: EnergyType[]) => {
     const type = calculateEnergyType(answers);
     setEnergyType(type);
