@@ -2,6 +2,9 @@
 
 import { motion } from "framer-motion";
 import { EnergyType, energyProfiles } from "@/lib/data";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 interface Props {
   energyType: EnergyType;
@@ -17,6 +20,12 @@ const levels = [
 
 export default function QuestMap({ energyType }: Props) {
   const profile = energyProfiles[energyType];
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push("/");
+  };
 
   return (
     <div className="min-h-dvh bg-white flex flex-col">
@@ -34,10 +43,14 @@ export default function QuestMap({ energyType }: Props) {
             <p className="text-gray-900 font-bold text-lg">{energyType}</p>
             <p className="text-gray-400 text-sm">Level 1 Complete</p>
           </div>
-          <div className="ml-auto flex items-center gap-1 bg-gray-100 px-3 py-1.5 rounded-full">
-            <span className="text-yellow-500">🏆</span>
-            <span className="text-gray-900 font-bold text-sm">1</span>
-          </div>
+          {/* Logout button */}
+          <button
+            onClick={handleLogout}
+            className="ml-auto flex items-center gap-1 bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 transition"
+          >
+            <span className="text-gray-600">🚪</span>
+            <span className="text-gray-900 font-bold text-sm">Logout</span>
+          </button>
         </motion.div>
 
         <motion.h1

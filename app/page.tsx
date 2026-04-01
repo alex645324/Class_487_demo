@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import OpeningScreen from "@/components/OpeningScreen";
 import QuizScreen from "@/components/QuizScreen";
@@ -9,46 +9,56 @@ import ChallengeScreen from "@/components/ChallengeScreen";
 import QuestMap from "@/components/QuestMap";
 import { EnergyType, calculateEnergyType } from "@/lib/data";
 import LoginScreen from "@/components/LoginScreen";
-import { saveUserData, loadUserData } from "@/lib/storage";
+import { userAuth } from "@/lib/userAuth";
+import { getUserData, saveUserData } from "@/lib/firestore";
 
 type Screen = "login"|"opening" | "quiz" | "result" | "challenge" | "questmap";
 
 export default function Home() {
+  const { user, loading } = userAuth();
   const [screen, setScreen] = useState<Screen>("login");
   const [energyType, setEnergyType] = useState<EnergyType>("Explorer");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const handleLogin = () => {
-  setIsAuthenticated(true);
 
-  //this code would allow users who already created accounts and done the onboarding questionaire to skip that part aftr
-  //logging back in with the same credentials, because we didnt implement a backend for the login function yet,
-  //this code doesnt work as intended and will send any user that logged in after the first to the questmap page
+  useEffect(() => {
+    if (user && !loading) {
+      const loadProgress = async () => {
+        const savedData = await getUserData(user);
+        if (savedData.energyType) {
+          setEnergyType(savedData.energyType);
+          if (savedData.challengeSelections.length > 0) {
+            setScreen("questmap");
+          } else {
+            setScreen("challenge");
+          }
+        } else {
+          setScreen("opening");
+        }
+      };
+      loadProgress();
+    }
+  }, [user, loading]);
 
-  //const savedData = loadUserData();
-  //if (savedData.energyType) {
-      //setEnergyType(savedData.energyType);
-      //if (savedData.challengeSelections.length > 0) {
-        //setScreen("questmap");
-     // } else {
-        //setScreen("challenge");
-     // }
-   // } else {
-     // setScreen("opening");
-    //}
-    setScreen("opening");
-    console.log("[Main] User logged in, starting Questionnaire:");
-};
-  const handleQuizComplete = (answers: EnergyType[]) => {
+  const handleQuizComplete = async (answers: EnergyType[]) => {
     const type = calculateEnergyType(answers);
     setEnergyType(type);
     setScreen("result");
-    saveUserData({ answers, energyType: type });
-  console.log("[Main] Quiz completed, saved:", { answers, energyType: type });
+    if (user) {
+      await saveUserData(user, { answers, energyType: type });
+    }
+    console.log("[Main] Quiz completed, saved:", { answers, energyType: type });
   };
 
-  if (!isAuthenticated) {
-  return <LoginScreen onLogin={handleLogin} />;
-}
+  if (loading) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center bg-white">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginScreen onLogin={() => {}} />;
+  }
 
   return (
     <main className="max-w-md mx-auto min-h-dvh">

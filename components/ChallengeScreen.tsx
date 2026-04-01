@@ -3,13 +3,15 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { challengeEnvironments, getReflection } from "@/lib/data";
-import { saveUserData } from "@/lib/storage";
+import { userAuth } from "@/lib/userAuth";
+import { saveUserData } from "@/lib/firestore";
 
 interface Props {
   onComplete: () => void;
 }
 
 export default function ChallengeScreen({ onComplete }: Props) {
+  const { user } = userAuth();
   const [selections, setSelections] = useState<string[]>([]);
   const [showReflection, setShowReflection] = useState(false);
 
@@ -19,13 +21,15 @@ export default function ChallengeScreen({ onComplete }: Props) {
       prev.includes(label) ? prev.filter((s) => s !== label) : [...prev, label]
     );
   };
+
   const handleSubmit = () => {
     if (selections.length === 0) return;
     setShowReflection(true);
 
-    //saves the selection choices made by users to storage
-    saveUserData({ challengeSelections: selections})
-    console.log("[Challenge] Saved Selections", selections);
+    if (user) {
+      saveUserData(user, { challengeSelections: selections });
+      console.log("[Challenge] Saved selections to Firestore:", selections);
+    }
   };
 
   return (

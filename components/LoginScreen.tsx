@@ -3,62 +3,68 @@
 "use client";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { saveUserData } from "@/lib/storage";
+import { auth } from "@/lib/firebase";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 
 interface Props {
   onLogin: () => void;
 }
 export default function LoginScreen({ onLogin }: Props) {
-  // For the form inputs and loading/error messages
+  // For the form inputs and the loading/error msgs
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // simulate the way SSO authentication would work, added a delay
-  const simulateAuth = (email: string) => {
-    console.log(`[Login] Simulating authentication for ${email}...`);
-    setIsLoading(true);
-    // Simulate network request (in real SSO this would redirect to Microsoft)
-    setTimeout(() => {
-      console.log(`[Login] Authentication successful for ${email}`);
-      // Store user data in localStorage (mock)
-      saveUserData({
-        user: {
-          email: email,
-          name: email.split("@")[0],
-          isAuthenticated: true,
-        },
-      });
-      setIsLoading(false);
-      onLogin(); // proceed to the main app
-    }, 1500);
-  };
-
-  // Handle form submission (fallback for manual entry)
+  // Real authentication using Firebase
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     // Validate email domain
     if (!email.endsWith("@psu.edu")) {
       console.warn("[Login] Invalid email domain:", email);
       setError("Please use your Penn State email (@psu.edu)");
+      setIsLoading(false);
       return;
     }
     if (!password) {
       setError("Please enter your password");
+      setIsLoading(false);
       return;
     }
 
-    // In a real implementation, this would send credentials to the backend
-    simulateAuth(email);
+    try {
+      // Try to create a new user first
+      await createUserWithEmailAndPassword(auth, email, password);
+      // If successful, proceed
+      onLogin();
+    } catch (err: any) {
+      // If user already exists, try to sign in
+      if (err.code === "auth/email-already-in-use") {
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          onLogin();
+        } catch (signInErr: any) {
+          console.error("[Login] Sign in error:", signInErr);
+          setError("Invalid password. Please try again.");
+        }
+      } else {
+        // Other errors (e.g., weak password, network)
+        console.error("[Login] Creation error:", err);
+        setError(err.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Mock SSO button – simulates how redirecting to Penn State's sso would work
   const handleSSORedirect = () => {
     console.log("[Login] Initiating Penn State SSO redirect (mock)");
-    simulateAuth("demo@psu.edu");
+    // Real implementation will redirect to Azure AD
+    setError("Real Penn State SSO will be added after registration.");
   };
 
   console.log("[Login] Rendering login screen");
