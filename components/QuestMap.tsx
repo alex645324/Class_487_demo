@@ -5,6 +5,7 @@ import { EnergyType, energyProfiles } from "@/lib/data";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
 
 interface Props {
   energyType: EnergyType;
@@ -21,11 +22,24 @@ const levels = [
 export default function QuestMap({ energyType }: Props) {
   const profile = energyProfiles[energyType];
   const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
     await signOut(auth);
     router.push("/");
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="min-h-dvh bg-white flex flex-col">
@@ -43,14 +57,35 @@ export default function QuestMap({ energyType }: Props) {
             <p className="text-gray-900 font-bold text-lg">{energyType}</p>
             <p className="text-gray-400 text-sm">Level 1 Complete</p>
           </div>
-          {/* Logout button */}
-          <button
-            onClick={handleLogout}
-            className="ml-auto flex items-center gap-1 bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 transition"
-          >
+
+          {/* Hamburger menu button */}
+          <div className="ml-auto relative" ref={menuRef}>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 rounded-full hover:bg-gray-100 transition"
+              aria-label="Menu"
+            >
+              <span className="text-gray-600 text-2xl">☰</span>
+            </button>
+
+            {/* Dropdown menu */}
+            {isMenuOpen && (
+            <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-10 py-2">
+            {/* Achievements item (visual only, no action) */}
+            <div className="px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition cursor-pointer">
+            <span className="text-yellow-500">🏆</span>
+            <span className="text-gray-900 font-bold text-sm">Achievements (1)</span>
+            </div>
+            {/* Logout button */}
+            <button
+              onClick={handleLogout}
+              className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
+            >
             <span className="text-gray-600">🚪</span>
             <span className="text-gray-900 font-bold text-sm">Logout</span>
-          </button>
+            </button>
+            </div> )}
+          </div>
         </motion.div>
 
         <motion.h1
@@ -63,7 +98,7 @@ export default function QuestMap({ energyType }: Props) {
         </motion.h1>
       </div>
 
-      {/* Map */}
+      {/* Rest of the component unchanged */}
       <div className="flex-1 px-6 pb-8 flex flex-col items-center">
         <div className="w-full max-w-xs space-y-0">
           {levels.map((level, i) => (
@@ -74,7 +109,6 @@ export default function QuestMap({ energyType }: Props) {
               transition={{ delay: 0.2 + i * 0.1 }}
               className="flex flex-col items-center"
             >
-              {/* Connector line */}
               {i > 0 && (
                 <div
                   className={`w-0.5 h-6 ${
@@ -82,8 +116,6 @@ export default function QuestMap({ energyType }: Props) {
                   }`}
                 />
               )}
-
-              {/* Node */}
               <div
                 className={`relative w-full rounded-2xl p-4 flex items-center gap-4 ${
                   level.completed
@@ -110,7 +142,6 @@ export default function QuestMap({ energyType }: Props) {
                     <span className="text-gray-300">🔒</span>
                   )}
                 </div>
-
                 <div className="flex-1">
                   <p
                     className={`text-xs font-semibold uppercase tracking-wider ${
@@ -135,7 +166,6 @@ export default function QuestMap({ energyType }: Props) {
                     {level.title}
                   </p>
                 </div>
-
                 {level.completed && (
                   <span className="text-yellow-500 text-xl">🏆</span>
                 )}
@@ -143,17 +173,13 @@ export default function QuestMap({ energyType }: Props) {
             </motion.div>
           ))}
         </div>
-
-        {/* Coming soon message */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
           className="mt-8 text-center"
         >
-          <p className="text-gray-400 text-sm">
-            More levels coming soon...
-          </p>
+          <p className="text-gray-400 text-sm">More levels coming soon...</p>
           <p className="text-gray-300 text-xs mt-1">
             Interests • Strengths • Careers • Experiences
           </p>
