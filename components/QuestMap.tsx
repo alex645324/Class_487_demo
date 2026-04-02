@@ -58,7 +58,7 @@ export default function QuestMap({ energyType }: Props) {
             <p className="text-gray-400 text-sm">Level 1 Complete</p>
           </div>
 
-          {/* Hamburger menu button */}
+          {/* Dropdown menu button */}
           <div className="ml-auto relative" ref={menuRef}>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -70,21 +70,55 @@ export default function QuestMap({ energyType }: Props) {
 
             {/* Dropdown menu */}
             {isMenuOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-10 py-2">
-            {/* Achievements item (visual only, no action) */}
-            <div className="px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition cursor-pointer">
-            <span className="text-yellow-500">🏆</span>
-            <span className="text-gray-900 font-bold text-sm">Achievements (1)</span>
-            </div>
-            {/* Logout button */}
-            <button
-              onClick={handleLogout}
-              className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
-            >
-            <span className="text-gray-600">🚪</span>
-            <span className="text-gray-900 font-bold text-sm">Logout</span>
-            </button>
-            </div> )}
+              <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-10 py-2">
+                {/* Achievements */}
+                <button
+                  onClick={() => router.push("/achievements")}
+                  className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
+                >
+                  <span className="text-yellow-500">🏆</span>
+                  <span className="text-gray-900 font-bold text-sm">Achievements</span>
+                </button>
+
+                {/* Log Activities */}
+                <button
+                  onClick={() => router.push("/activities")}
+                  className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
+                >
+                  <span className="text-blue-500">📝</span>
+                  <span className="text-gray-900 font-bold text-sm">Log Activities</span>
+                </button>
+
+                {/* Upload Resume */}
+                <button
+                  onClick={() => router.push("/resume")}
+                  className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
+                >
+                  <span className="text-green-500">📄</span>
+                  <span className="text-gray-900 font-bold text-sm">Upload Resume</span>
+                </button>
+
+                {/* Counselor View */}
+                <button
+                  onClick={() => router.push("/counselor")}
+                  className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
+                >
+                  <span className="text-purple-500">👥</span>
+                  <span className="text-gray-900 font-bold text-sm">Counselor View</span>
+                </button>
+
+                <div className="border-t border-gray-100 my-1"></div>
+
+                {/* Logout */}
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
+                >
+                  <span className="text-gray-600">🚪</span>
+                  <span className="text-gray-900 font-bold text-sm">Logout</span>
+                </button>
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -97,8 +131,6 @@ export default function QuestMap({ energyType }: Props) {
           Your Quest Map
         </motion.h1>
       </div>
-
-      {/* Rest of the component unchanged */}
       <div className="flex-1 px-6 pb-8 flex flex-col items-center">
         <div className="w-full max-w-xs space-y-0">
           {levels.map((level, i) => (

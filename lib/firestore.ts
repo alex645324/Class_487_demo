@@ -1,7 +1,9 @@
 import { db } from "./firebase";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { User } from "firebase/auth";
 import { EnergyType } from "./data";
+import { getBadges as computeBadges } from "./storage";
+import { Activity } from "./activity";
 
 export interface UserData {
   answers: EnergyType[];
@@ -9,6 +11,10 @@ export interface UserData {
   challengeSelections: string[];
   points: number;
   badges: string[];
+  totalPoints?: number;
+  resumeUrl?: string;
+  resumeFeedback?: string;
+  email?: string;
 }
 
 // Saves the users data to Firestore
@@ -17,11 +23,17 @@ export async function saveUserData(user: User, data: Partial<UserData>) {
   const userRef = doc(db, "users", user.uid);
   const existing = await getUserData(user);
   const updated = { ...existing, ...data };
+
+  // Making sure the email is stored correctly
+  if (!updated.email && user.email) {
+    updated.email = user.email;
+  }
+
   await setDoc(userRef, updated, { merge: true });
   console.log("[Firestore] Saved user data:", updated);
 }
 
-// Loads users data from Firestore
+// Loads data from Firestore regarding the user
 export async function getUserData(user: User): Promise<UserData> {
   if (!user) {
     return {
@@ -46,8 +58,17 @@ export async function getUserData(user: User): Promise<UserData> {
       badges: [],
     };
   }
-  return snap.data() as UserData;
+    const data = snap.data() as UserData;
+    const computedBadges = computeBadges(data);
+    if (JSON.stringify(computedBadges) !== JSON.stringify(data.badges)) {
+        // updates Firestore if badges change
+        await updateDoc(userRef, { badges: computedBadges });
+  }
+
+    // Returns data with the badges
+    return { ...data, badges: computedBadges };
 }
+
 
 // Calculate users points based on their completed actions
 export function calculatePoints(userData: UserData): number {
@@ -57,7 +78,7 @@ export function calculatePoints(userData: UserData): number {
   return points;
 }
 
-// Users gain badges based on completed actions
+// Users gain badges based on actions that theyve completed
 export function getBadges(userData: UserData): string[] {
   const badges: string[] = [];
   if (userData.answers.length > 0) badges.push("🎓 First Quiz");
