@@ -9,6 +9,10 @@ export interface UserData {
   answers: EnergyType[];
   energyType: EnergyType | null;
   challengeSelections: string[];
+  interests: string[];
+  strengths: string[];
+  savedCareers: string[];
+  completedLevels: number[];
   points: number;
   badges: string[];
   totalPoints?: number;
@@ -40,6 +44,10 @@ export async function getUserData(user: User): Promise<UserData> {
       answers: [],
       energyType: null,
       challengeSelections: [],
+      interests: [],
+      strengths: [],
+      savedCareers: [],
+      completedLevels: [1],
       points: 0,
       badges: [],
     };
@@ -54,6 +62,10 @@ export async function getUserData(user: User): Promise<UserData> {
       answers: [],
       energyType: null,
       challengeSelections: [],
+      interests: [],
+      strengths: [],
+      savedCareers: [],
+      completedLevels: [1],
       points: 0,
       badges: [],
     };
