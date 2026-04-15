@@ -74,7 +74,7 @@ export default function Home() {
   }
 
   if (!user) {
-    return <LoginScreen onLogin={() => {}} />;
+    return <LoginScreen >;
   }
 
   return (
