@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { userAuth } from "@/lib/userAuth";
 import { addActivity, getUserActivities, Activity } from "@/lib/activity";
 import { useRouter } from "next/navigation";
+import HamburgerMenu from "@/components/HamburgerMenu";
 
 export default function ActivitiesPage() {
   const { user, loading } = userAuth();
@@ -62,8 +63,10 @@ export default function ActivitiesPage() {
 
   return (
     <div className="min-h-dvh bg-white p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Log Your Experience</h1>
-
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Log Your Experience</h1>
+         <HamburgerMenu currentPage="activities" />
+        </div>
       <form onSubmit={handleSubmit} className="space-y-4 mb-8">
         <div>
           <label className="block text-sm font-medium mb-1">Activity Type</label>
@@ -134,10 +137,10 @@ export default function ActivitiesPage() {
 
       <div className="mt-6 text-center">
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/student/home")}
           className="text-gray-500 underline"
         >
-          Back to Quest Map
+          Back to Home Page
         </button>
       </div>
     </div>

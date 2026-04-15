@@ -6,6 +6,7 @@ import { storage, db } from "@/lib/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import HamburgerMenu from "@/components/HamburgerMenu";
 
 export default function ResumePage() {
   const { user, loading } = userAuth();
@@ -44,12 +45,12 @@ export default function ResumePage() {
 
     setUploading(true);
     try {
-      // Uploads submitted file (resume) to storage
+      // Uploads submitted file (supposed to be ur resume) to storage
       const storageRef = ref(storage, `resumes/${user.uid}/${file.name}`);
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
 
-      // Saves the URL in firestore
+      // Saves the URL in firestore database
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, { resumeUrl: downloadURL });
 
@@ -69,7 +70,10 @@ export default function ResumePage() {
 
   return (
     <div className="min-h-dvh bg-white p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Resume Upload & Review</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Resume Upload & Review</h1>
+        <HamburgerMenu currentPage="resume" />
+      </div>
 
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-2">Upload a New Resume</h2>
@@ -111,8 +115,8 @@ export default function ResumePage() {
       )}
 
       <div className="mt-6 text-center">
-        <button onClick={() => router.push("/")} className="text-gray-500 underline">
-          Back to Quest Map
+        <button onClick={() => router.push("/student/home")} className="text-gray-500 underline">
+          Back to Home Page
         </button>
       </div>
     </div>

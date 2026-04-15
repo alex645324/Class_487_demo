@@ -5,11 +5,15 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { initializeUserWithRole } from "@/lib/firestore";
 
 interface Props {
-  onLogin: () => void;
+  onLogin?: () => void; // kept for compatibility but no longer used
 }
-export default function LoginScreen({ onLogin }: Props) {
+export default function LoginScreen() {
+  const router = useRouter();
+
   // For the form inputs and the loading/error msgs
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,15 +41,24 @@ export default function LoginScreen({ onLogin }: Props) {
 
     try {
       // Try to create a new user first
-      await createUserWithEmailAndPassword(auth, email, password);
-      // If successful, proceed
-      onLogin();
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const { role } = await initializeUserWithRole(user);
+      document.cookie = `userRole=${role}; path=/`;
+      if (role === "counselor") router.push("/counselor/dashboard");
+      else if (role === "admin") router.push("/admin/dashboard");
+      else router.push("/student/home");
     } catch (err: any) {
       // If user already exists, try to sign in
       if (err.code === "auth/email-already-in-use") {
         try {
-          await signInWithEmailAndPassword(auth, email, password);
-          onLogin();
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+          const { role } = await initializeUserWithRole(user);
+          document.cookie = `userRole=${role}; path=/`;
+          if (role === "counselor") router.push("/counselor");
+          else if (role === "admin") router.push("/admin");
+          else router.push("/student/home");
         } catch (signInErr: any) {
           console.error("[Login] Sign in error:", signInErr);
           setError("Invalid password. Please try again.");

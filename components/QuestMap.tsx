@@ -6,6 +6,8 @@ import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
+import HamburgerMenu from "@/components/HamburgerMenu";
+
 
 interface Props {
   energyType: EnergyType;
@@ -61,56 +63,7 @@ export default function QuestMap({ energyType, completedLevels, onStartLevel }: 
           </div>
 
           {/* Dropdown menu button */}
-          <div className="ml-auto relative" ref={menuRef}>
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-full hover:bg-gray-100 transition"
-              aria-label="Menu"
-            >
-              <span className="text-gray-600 text-2xl">☰</span>
-            </button>
-
-            {isMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-10 py-2">
-                <button
-                  onClick={() => router.push("/achievements")}
-                  className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
-                >
-                  <span className="text-yellow-500">🏆</span>
-                  <span className="text-gray-900 font-bold text-sm">Achievements</span>
-                </button>
-                <button
-                  onClick={() => router.push("/activities")}
-                  className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
-                >
-                  <span className="text-blue-500">📝</span>
-                  <span className="text-gray-900 font-bold text-sm">Log Activities</span>
-                </button>
-                <button
-                  onClick={() => router.push("/resume")}
-                  className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
-                >
-                  <span className="text-green-500">📄</span>
-                  <span className="text-gray-900 font-bold text-sm">Upload Resume</span>
-                </button>
-                <button
-                  onClick={() => router.push("/counselor")}
-                  className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
-                >
-                  <span className="text-purple-500">👥</span>
-                  <span className="text-gray-900 font-bold text-sm">Counselor View</span>
-                </button>
-                <div className="border-t border-gray-100 my-1"></div>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
-                >
-                  <span className="text-gray-600">🚪</span>
-                  <span className="text-gray-900 font-bold text-sm">Logout</span>
-                </button>
-              </div>
-            )}
-          </div>
+           <HamburgerMenu currentPage="questmap" />
         </motion.div>
 
         <motion.h1
@@ -208,7 +161,15 @@ export default function QuestMap({ energyType, completedLevels, onStartLevel }: 
             );
           })}
         </div>
-
+        {/* Back to Home page button */}
+        <div className="mt-8 text-center">
+        <button
+            onClick={() => router.push("/student/home")}
+            className="text-[#1E407C] underline text-sm"
+        >
+          Back to Home Page
+        </button>
+      </div>
         {maxCompleted < 4 && (
           <motion.div
             initial={{ opacity: 0 }}

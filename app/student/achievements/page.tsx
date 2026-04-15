@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { userAuth } from "@/lib/userAuth";
 import { getUserData } from "@/lib/firestore";
 import { useRouter } from "next/navigation";
+import HamburgerMenu from "@/components/HamburgerMenu";
 
 export default function AchievementsPage() {
   const { user, loading } = userAuth();
@@ -31,12 +32,16 @@ export default function AchievementsPage() {
   if (!user) return null;
   return (
     <div className="min-h-dvh bg-white p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-2">Your Achievements</h1>
+    <div className="flex justify-between items-center mb-2">
+        <h1 className="text-2xl font-bold">Achievements</h1>
+        <HamburgerMenu currentPage="achievements"/>
+        </div>
       <p className="text-gray-500 mb-6">Badges and quests you've earned</p>
 
       <div className="bg-gray-50 rounded-2xl p-4 mb-6">
         <p className="text-sm text-gray-500">Total Points</p>
         <p className="text-3xl font-bold">{points}</p>
+
       </div>
 
       <h2 className="text-xl font-semibold mb-3">🏆 Badges</h2>
@@ -89,8 +94,8 @@ export default function AchievementsPage() {
       </div>
 
       <div className="mt-8 text-center">
-        <button onClick={() => router.push("/")} className="text-gray-500 underline">
-          Back to Quest Map
+        <button onClick={() => router.push("/student/home")} className="text-gray-500 underline">
+          Back to Home Page
         </button>
       </div>
     </div>
