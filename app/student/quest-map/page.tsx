@@ -11,15 +11,13 @@ import Level2Screen from "@/components/Level2Screen";
 import Level3Screen from "@/components/Level3Screen";
 import Level4Screen from "@/components/Level4Screen";
 import { EnergyType, calculateEnergyType } from "@/lib/data";
-import LoginScreen from "@/components/LoginScreen";
 import { userAuth } from "@/lib/userAuth";
 import { getUserData, saveUserData } from "@/lib/firestore";
-import HamburgerMenu from "@/components/HamburgerMenu";
 
-type Screen = "login" | "opening" | "quiz" | "result" | "challenge" | "questmap" | "level2" | "level3" | "level4";
+type Screen = "opening" | "quiz" | "result" | "challenge" | "questmap" | "level2" | "level3" | "level4";
 export default function Home() {
   const { user, loading } = userAuth();
-  const [screen, setScreen] = useState<Screen>("login");
+  const [screen, setScreen] = useState<Screen>("opening");
   const [energyType, setEnergyType] = useState<EnergyType>("Explorer");
   const [completedLevels, setCompletedLevels] = useState<number[]>([1]);
 
@@ -73,9 +71,7 @@ export default function Home() {
     );
   }
 
-  if (!user) {
-    return <LoginScreen />;
-  }
+  if (!user) return null;
 
   return (
     <main className="max-w-md mx-auto min-h-dvh">

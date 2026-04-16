@@ -8,9 +8,6 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "fire
 import { useRouter } from "next/navigation";
 import { initializeUserWithRole } from "@/lib/firestore";
 
-interface Props {
-  onLogin?: () => void; // kept for compatibility but no longer used
-}
 export default function LoginScreen() {
   const router = useRouter();
 
@@ -21,15 +18,20 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const redirectByRole = (role: string) => {
+    document.cookie = `userRole=${role}; path=/`;
+    if (role === "counselor") router.push("/counselor");
+    else if (role === "admin") router.push("/admin");
+    else router.push("/student/home");
+  };
+
   // Real authentication using Firebase
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
-    // Validate email domain
     if (!email.endsWith("@psu.edu")) {
-      console.warn("[Login] Invalid email domain:", email);
       setError("Please use your Penn State email (@psu.edu)");
       setIsLoading(false);
       return;
@@ -43,29 +45,19 @@ export default function LoginScreen() {
     try {
       // Try to create a new user first
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const { role } = await initializeUserWithRole(user, selectedRole);
-      document.cookie = `userRole=${role}; path=/`;
-      if (role === "counselor") router.push("/counselor/dashboard");
-      else if (role === "admin") router.push("/admin/dashboard");
-      else router.push("/student/home");
+      await initializeUserWithRole(userCredential.user, selectedRole);
+      redirectByRole(selectedRole);
     } catch (err: any) {
-      // If user already exists, try to sign in
       if (err.code === "auth/email-already-in-use") {
         try {
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
-          const user = userCredential.user;
-          const { role } = await initializeUserWithRole(user, selectedRole);
-          document.cookie = `userRole=${role}; path=/`;
-          if (role === "counselor") router.push("/counselor");
-          else if (role === "admin") router.push("/admin");
-          else router.push("/student/home");
+          await initializeUserWithRole(userCredential.user, selectedRole);
+          redirectByRole(selectedRole);
         } catch (signInErr: any) {
           console.error("[Login] Sign in error:", signInErr);
           setError("Invalid password. Please try again.");
         }
       } else {
-        // Other errors (e.g., weak password, network)
         console.error("[Login] Creation error:", err);
         setError(err.message);
       }
@@ -80,8 +72,6 @@ export default function LoginScreen() {
     // Real implementation will redirect to Azure AD
     setError("Real Penn State SSO will be added after registration.");
   };
-
-  console.log("[Login] Rendering login screen");
 
   return (
     <div className="min-h-dvh flex flex-col items-center justify-center bg-white px-6">

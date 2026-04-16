@@ -2,12 +2,8 @@
 
 import { motion } from "framer-motion";
 import { EnergyType, energyProfiles } from "@/lib/data";
-import { auth } from "@/lib/firebase";
-import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
 import HamburgerMenu from "@/components/HamburgerMenu";
-
 
 interface Props {
   energyType: EnergyType;
@@ -26,24 +22,7 @@ const levels = [
 export default function QuestMap({ energyType, completedLevels, onStartLevel }: Props) {
   const profile = energyProfiles[energyType];
   const router = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const maxCompleted = Math.max(...completedLevels);
-
-  const handleLogout = async () => {
-    await signOut(auth);
-    router.push("/");
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   return (
     <div className="min-h-dvh bg-white flex flex-col">

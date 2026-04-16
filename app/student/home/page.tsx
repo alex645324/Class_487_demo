@@ -2,44 +2,25 @@
 import { useRouter } from "next/navigation";
 import { userAuth } from "@/lib/userAuth";
 import { getUserData } from "@/lib/firestore";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import HamburgerMenu from "@/components/HamburgerMenu";
 
 export default function StudentHomePage() {
   const { user, loading } = userAuth();
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!loading && !user) router.push("/");
     if (user) {
-      getUserData(user).then((data)=> {
-          setUserData(data);
-          if (!data.name || data.name.trim() === "") {
-            router.push("/student/onboarding");
-          }
-    });
+      getUserData(user).then((data) => {
+        setUserData(data);
+        if (!data.name || data.name.trim() === "") {
+          router.push("/student/onboarding");
+        }
+      });
     }
   }, [user, loading, router]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const handleLogout = async () => {
-    await signOut(auth);
-    router.push("/");
-  };
 
   if (loading) return <div className="min-h-dvh flex items-center justify-center">Loading...</div>;
   if (!user) return null;

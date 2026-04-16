@@ -13,7 +13,6 @@ export default function OnboardingScreen({ onComplete }: Props) {
   const [name, setName] = useState("");
   const [year, setYear] = useState("");
   const [major, setMajor] = useState("");
-  const [role, setRole] = useState<"student" | "counselor" | "admin">("student");
   const [isLoading, setIsLoading] = useState(false);
 
   const years = ["Freshman", "Sophomore", "Junior", "Senior", "Graduate", "Other"];
@@ -32,9 +31,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
     if (!name.trim() || !year || !major) return;
     setIsLoading(true);
     if (user) {
-      await saveUserData(user, { name, year, major, role });
-      // Update cookies
-      document.cookie = `userRole=${role}; path=/`;
+      await saveUserData(user, { name, year, major });
     }
     onComplete();
   };
@@ -95,23 +92,6 @@ export default function OnboardingScreen({ onComplete }: Props) {
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Account Type *
-            </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as typeof role)}
-              className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E407C]"
-            >
-              <option value="student">Student</option>
-              <option value="counselor">Counselor</option>
-              <option value="admin">Admin</option>
-            </select>
-            <p className="text-xs text-gray-400 mt-1">
-              For demo purposes only. In production, role selection would be restricted.
-            </p>
-          </div>
         </div>
 
         <motion.button

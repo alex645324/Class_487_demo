@@ -3,15 +3,17 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { userAuth } from "@/lib/userAuth";
 import LoginScreen from "@/components/LoginScreen";
-import { initializeUserWithRole } from "@/lib/firestore";
+import { getUserData } from "@/lib/firestore";
 
 export default function Home() {
   const { user, loading } = userAuth();
   const router = useRouter();
 
+  // If already logged in, read their saved role and redirect
   useEffect(() => {
     if (!loading && user) {
-      initializeUserWithRole(user).then(({ role }) => {
+      getUserData(user).then((data) => {
+        const role = data.role || "student";
         if (role === "counselor") router.push("/counselor");
         else if (role === "admin") router.push("/admin");
         else router.push("/student/home");

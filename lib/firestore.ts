@@ -3,7 +3,6 @@ import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { User } from "firebase/auth";
 import { EnergyType } from "./data";
 import { getBadges as computeBadges } from "./storage";
-import { Activity } from "./activity";
 
 export interface UserData {
   answers: EnergyType[];
@@ -19,51 +18,46 @@ export interface UserData {
   resumeUrl?: string;
   resumeFeedback?: string;
   email?: string;
-  role?:"student"| "counselor" | "admin" //role checking functionality so we can redirect users accordingly
+  role?: "student" | "counselor" | "admin";
   name?: string;
   year?: string;
   major?: string;
 }
 
-//initializing user with the defualt roll of student upon sign up, will give counselors and admins different rolls through firebase
+const DEFAULT_USER_DATA: UserData = {
+  answers: [],
+  energyType: null,
+  challengeSelections: [],
+  interests: [],
+  strengths: [],
+  savedCareers: [],
+  completedLevels: [1],
+  points: 0,
+  badges: [],
+  role: "student",
+  name: "",
+  year: "",
+  major: "",
+};
+
 export async function initializeUserWithRole(user: User, selectedRole?: "student" | "counselor" | "admin"): Promise<{ role: string }> {
   const userRef = doc(db, "users", user.uid);
   const snap = await getDoc(userRef);
+  const role = selectedRole || "student";
 
   if (!snap.exists()) {
-    // New user – create document with the role they selected (defaults to student)
-    const newUserData = {
-      email: user.email,
-      role: selectedRole || "student",
-      points: 0,
-      badges: [],
-      completedLevels: [1],
-      answers: [],
-      energyType: null,
-      challengeSelections: [],
-      interests: [],
-      strengths: [],
-      savedCareers: [],
-      name: "",
-      year: "",
-      major: "",
-      createdAt: new Date(),
-    };
-    await setDoc(userRef, newUserData);
-    console.log("[Firestore] Created new user with role:", selectedRole || "student", user.email);
-    return { role: selectedRole || "student" };
+    await setDoc(userRef, { ...DEFAULT_USER_DATA, email: user.email, role, createdAt: new Date() });
+    return { role };
   } else {
-    // Existing user – update role if one was explicitly selected, otherwise keep existing
-    const data = snap.data();
     if (selectedRole) {
       await updateDoc(userRef, { role: selectedRole });
       return { role: selectedRole };
     }
-    const role = data.role || "student";
-    if (!data.role) {
+    const existingRole = snap.data().role || "student";
+    if (!snap.data().role) {
       await updateDoc(userRef, { role: "student" });
     }
-    return { role };
+    return { role: existingRole };
   }
 }
 
@@ -85,57 +79,18 @@ export async function saveUserData(user: User, data: Partial<UserData>) {
 
 // Loads data from Firestore regarding the user
 export async function getUserData(user: User): Promise<UserData> {
-  if (!user) {
-    return {
-      answers: [],
-      energyType: null,
-      challengeSelections: [],
-      interests: [],
-      strengths: [],
-      savedCareers: [],
-      completedLevels: [1],
-      points: 0,
-      badges: [],
-      role: "student",
-      name: "",
-      year: "",
-      major: "",
-    };
-  }
+  if (!user) return { ...DEFAULT_USER_DATA };
 
   const userRef = doc(db, "users", user.uid);
   const snap = await getDoc(userRef);
 
-  if (!snap.exists()) {
-    console.log("[Firestore] No existing data for user, returning defaults");
-    return {
-      answers: [],
-      energyType: null,
-      challengeSelections: [],
-      interests: [],
-      strengths: [],
-      savedCareers: [],
-      completedLevels: [1],
-      points: 0,
-      badges: [],
-      role: "student",
-      name: "",
-      year: "",
-      major: "",
-    };
-  }
-  const data = snap.data() as UserData;
-  if (!data.role) data.role = "student";
-  if (data.name === undefined) data.name = "";
-  if (data.year === undefined) data.year = "";
-  if (data.major === undefined) data.major = "";
+  if (!snap.exists()) return { ...DEFAULT_USER_DATA };
+
+  const data = { ...DEFAULT_USER_DATA, ...snap.data() } as UserData;
   const computedBadges = computeBadges(data);
   if (JSON.stringify(computedBadges) !== JSON.stringify(data.badges)) {
-    // updates Firestore if badges change
     await updateDoc(userRef, { badges: computedBadges });
   }
-
-  // Returns data with the badges
   return { ...data, badges: computedBadges };
 }
 
