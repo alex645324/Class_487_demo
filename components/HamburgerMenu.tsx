@@ -5,7 +5,7 @@ import { auth } from "@/lib/firebase";
 import { useState, useRef, useEffect } from "react";
 
 interface Props {
-  currentPage?: "home" | "achievements" | "activities" | "resume" | "events" | "messages" | "questmap";
+  currentPage?: "home" | "achievements" | "activities" | "resume" | "events" | "messages" | "questmap"|"feed";
 }
 
 export default function HamburgerMenu({ currentPage }: Props) {
