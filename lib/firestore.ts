@@ -26,15 +26,15 @@ export interface UserData {
 }
 
 //initializing user with the defualt roll of student upon sign up, will give counselors and admins different rolls through firebase
-export async function initializeUserWithRole(user: User): Promise<{ role: string }> {
+export async function initializeUserWithRole(user: User, selectedRole?: "student" | "counselor" | "admin"): Promise<{ role: string }> {
   const userRef = doc(db, "users", user.uid);
   const snap = await getDoc(userRef);
 
   if (!snap.exists()) {
-    // New user – create document with default student role
+    // New user – create document with the role they selected (defaults to student)
     const newUserData = {
       email: user.email,
-      role: "student",  // default
+      role: selectedRole || "student",
       points: 0,
       badges: [],
       completedLevels: [1],
@@ -50,13 +50,16 @@ export async function initializeUserWithRole(user: User): Promise<{ role: string
       createdAt: new Date(),
     };
     await setDoc(userRef, newUserData);
-    console.log("[Firestore] Created new user with student role:", user.email);
-    return { role: "student" };
+    console.log("[Firestore] Created new user with role:", selectedRole || "student", user.email);
+    return { role: selectedRole || "student" };
   } else {
-    // Existing user – return their role (or default to student if missing for old users)
+    // Existing user – update role if one was explicitly selected, otherwise keep existing
     const data = snap.data();
+    if (selectedRole) {
+      await updateDoc(userRef, { role: selectedRole });
+      return { role: selectedRole };
+    }
     const role = data.role || "student";
-    // If role field missing, update it now
     if (!data.role) {
       await updateDoc(userRef, { role: "student" });
     }

@@ -14,7 +14,8 @@ interface Props {
 export default function LoginScreen() {
   const router = useRouter();
 
-  // For the form inputs and the loading/error msgs
+  // Role selection and form inputs
+  const [selectedRole, setSelectedRole] = useState<"student" | "counselor" | "admin">("student");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +44,7 @@ export default function LoginScreen() {
       // Try to create a new user first
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      const { role } = await initializeUserWithRole(user);
+      const { role } = await initializeUserWithRole(user, selectedRole);
       document.cookie = `userRole=${role}; path=/`;
       if (role === "counselor") router.push("/counselor/dashboard");
       else if (role === "admin") router.push("/admin/dashboard");
@@ -54,7 +55,7 @@ export default function LoginScreen() {
         try {
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
           const user = userCredential.user;
-          const { role } = await initializeUserWithRole(user);
+          const { role } = await initializeUserWithRole(user, selectedRole);
           document.cookie = `userRole=${role}; path=/`;
           if (role === "counselor") router.push("/counselor");
           else if (role === "admin") router.push("/admin");
@@ -123,6 +124,29 @@ export default function LoginScreen() {
         <div className="flex-1 h-px bg-gray-200" />
         <span className="text-xs text-gray-400">or</span>
         <div className="flex-1 h-px bg-gray-200" />
+      </div>
+
+      {/* Role selector */}
+      <div className="w-full max-w-sm mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          I am a...
+        </label>
+        <div className="flex gap-2">
+          {(["student", "counselor", "admin"] as const).map((role) => (
+            <button
+              key={role}
+              type="button"
+              onClick={() => setSelectedRole(role)}
+              className={`flex-1 py-3 rounded-xl text-sm font-medium capitalize transition-colors ${
+                selectedRole === role
+                  ? "bg-[#1E407C] text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {role}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Manual login form for demo, real SSO wouldn't need this) */}
