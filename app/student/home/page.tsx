@@ -32,6 +32,7 @@ export default function StudentHomePage() {
     { title: "Events", icon: "📅", path: "/student/events", color: "bg-purple-50" },
     { title: "Upload Resume", icon: "📄", path: "/student/resume", color: "bg-red-50" },
     { title: "Messages", icon: "💬", path: "/student/messages", color: "bg-indigo-50" },
+    { title: "Social Feed", icon: "👥", path: "/student/feed", color: "bg-pink-50" },
   ];
 
   return (

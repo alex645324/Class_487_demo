@@ -36,6 +36,7 @@ export default function HamburgerMenu({ currentPage }: Props) {
     { id: "resume", label: "Upload Resume", icon: "📄", path: "/student/resume" },
     { id: "events", label: "Events", icon: "📅", path: "/student/events" },
     { id: "messages", label: "Messages", icon: "💬", path: "/student/messages" },
+    { id: "feed", label: "Social Feed", icon: "👥", path: "/student/feed" },
   ];
 
   return (
