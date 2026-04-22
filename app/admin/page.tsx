@@ -51,7 +51,7 @@ interface SocialPost {
   isFlagged?: boolean;
 }
 
-type AdminTab = "users" | "quests" | "badges" | "feed";
+type AdminTab = "users" | "quests" | "badges" | "feed" | "analytics";
 
 export default function AdminPage() {
   const { user, loading } = userAuth();
@@ -79,6 +79,10 @@ export default function AdminPage() {
   // Social feed
   const [feedPosts, setFeedPosts] = useState<SocialPost[]>([]);
 
+  // Analytics
+  const [analyticsStats, setAnalyticsStats] = useState({ totalUsers: 0, totalActivities: 0, avgPoints: 0, activeLast7Days: 0 });
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+
   // Role checking
   useEffect(() => {
     if (!loading) {
@@ -99,10 +103,47 @@ export default function AdminPage() {
       if (activeTab === "quests") fetchQuests();
       if (activeTab === "badges") fetchBadges();
       if (activeTab === "feed") fetchFeedPosts();
+      if (activeTab === "analytics") fetchAnalytics();
     }
   }, [authorized, user, activeTab]);
 
-  // User Management
+  // Analytics fetching
+  const fetchAnalytics = async () => {
+    setLoadingAnalytics(true);
+    try {
+      const usersSnap = await getDocs(collection(db, "users"));
+      const totalUsers = usersSnap.size;
+      let totalPoints = 0;
+      let totalActivities = 0;
+      let activeCount = 0;
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      for (const docSnap of usersSnap.docs) {
+        const data = docSnap.data();
+        totalPoints += data.points || 0;
+        const activities = data.activities || [];
+        totalActivities += activities.length;
+        const recentActivity = activities.some((act: any) => {
+          const actDate = act.timestamp?.toDate?.() || new Date(act.timestamp);
+          return actDate > sevenDaysAgo;
+        });
+        if (recentActivity) activeCount++;
+      }
+      setAnalyticsStats({
+        totalUsers,
+        totalActivities,
+        avgPoints: totalUsers ? Math.round(totalPoints / totalUsers) : 0,
+        activeLast7Days: activeCount,
+      });
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+    } finally {
+      setLoadingAnalytics(false);
+    }
+  };
+
+  // User Management (same as before)
   const fetchUsers = async () => {
     try {
       const snapshot = await getDocs(collection(db, "users"));
@@ -339,7 +380,7 @@ export default function AdminPage() {
       {/* Tabs */}
       <div className="border-b border-gray-200 bg-white px-6">
         <div className="flex gap-4">
-          {(["users", "quests", "badges", "feed"] as const).map((tab) => (
+          {(["users", "quests", "badges", "feed", "analytics"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -351,6 +392,7 @@ export default function AdminPage() {
               {tab === "quests" && "Quests"}
               {tab === "badges" && "Badges"}
               {tab === "feed" && "Social Feed"}
+              {tab === "analytics" && "Analytics"}
             </button>
           ))}
         </div>
@@ -564,6 +606,35 @@ export default function AdminPage() {
                     <button onClick={() => deletePost(post.id)} className="bg-red-600 text-white px-3 py-1 rounded text-sm">Delete</button>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Analytics Tab */}
+        {activeTab === "analytics" && (
+          <div className="bg-white rounded-xl shadow p-6">
+            <h2 className="text-lg font-bold mb-4">Platform Analytics</h2>
+            {loadingAnalytics ? (
+              <div className="text-center py-8">Loading analytics...</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-500">Total Users</p>
+                  <p className="text-3xl font-bold">{analyticsStats.totalUsers}</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-500">Total Activities Logged</p>
+                  <p className="text-3xl font-bold">{analyticsStats.totalActivities}</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-500">Average Points per User</p>
+                  <p className="text-3xl font-bold">{analyticsStats.avgPoints}</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-500">Active Users (Last 7 Days)</p>
+                  <p className="text-3xl font-bold">{analyticsStats.activeLast7Days}</p>
+                </div>
               </div>
             )}
           </div>

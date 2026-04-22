@@ -279,3 +279,91 @@ export function getCareerReflection(energyType: EnergyType, selectedCareers: str
   if (selectedCareers.length === 2) return `You're drawn to ${selectedCareers[0]} and ${selectedCareers[1]}. Both tap into your ${energyType} energy in different ways — explore what they have in common.`;
   return `You've flagged ${selectedCareers.length} careers that resonate. As a ${energyType}, look for the thread connecting them — that's where your sweet spot is.`;
 }
+export const valuesList = [
+  { label: "Social Justice & Equity", icon: "⚖️", description: "Fairness for all people" },
+  { label: "Mental Health Awareness", icon: "🧠", description: "Support well‑being" },
+  { label: "Environmental Sustainability", icon: "🌍", description: "Protect the planet" },
+  { label: "Innovation & Technology", icon: "💻", description: "Push boundaries" },
+  { label: "Community & Belonging", icon: "🏘️", description: "Build connections" },
+  { label: "Financial Stability", icon: "💰", description: "Security and growth" },
+  { label: "Creativity & Expression", icon: "🎨", description: "Art and ideas" },
+  { label: "Leadership & Influence", icon: "👑", description: "Guide others" },
+];
+
+export function getValueReflection(energyType: EnergyType, values: string[]): string {
+  if (values.length === 0) return "";
+  return `Your values — ${values.join(", ")} — align with your ${energyType} energy. Look for careers and companies that share these values.`;
+}
+
+export const naceCompetencies = [
+  { label: "Career & Self‑Development", description: "Proactively develop yourself through learning and self‑awareness.", icon: "📈" },
+  { label: "Communication", description: "Exchange information, ideas, and perspectives clearly.", icon: "💬" },
+  { label: "Critical Thinking", description: "Solve problems using logic and analysis.", icon: "🧠" },
+  { label: "Equity & Inclusion", description: "Engage and include people from diverse cultures.", icon: "🤝" },
+  { label: "Leadership", description: "Use personal and team strengths to achieve goals.", icon: "👑" },
+  { label: "Professionalism", description: "Demonstrate effective work habits and act in the community's interest.", icon: "💼" },
+  { label: "Teamwork", description: "Collaborate toward common goals, appreciating diverse viewpoints.", icon: "👥" },
+  { label: "Technology", description: "Use technology ethically and efficiently.", icon: "💻" },
+];
+
+export const naceRecommendations: Record<EnergyType, string[]> = {
+  Explorer: ["Career & Self‑Development", "Critical Thinking", "Technology"],
+  Builder: ["Technology", "Critical Thinking", "Professionalism"],
+  Connector: ["Communication", "Equity & Inclusion", "Teamwork"],
+  Creator: ["Communication", "Leadership", "Technology"],
+  Strategist: ["Critical Thinking", "Leadership", "Professionalism"],
+};
+
+export function getNaceReflection(energyType: EnergyType, selections: string[]): string {
+  if (selections.length === 0) return "";
+  return `As a ${energyType}, focusing on ${selections.join(", ")} will build your NACE career readiness. Try the suggested quests in your map.`;
+}
+export interface NACEQuest {
+  title: string;
+  description: string;
+  points: number;
+  link?: string;
+}
+
+export const naceQuests: Record<string, NACEQuest[]> = {
+  "Career & Self‑Development": [
+    { title: "Complete a SWOT analysis", description: "Identify your strengths, weaknesses, opportunities, threats.", points: 50 },
+    { title: "Attend a career fair", description: "Meet employers and practice networking.", points: 100 },
+    { title: "Set 3 SMART goals", description: "Write specific, measurable goals for the semester.", points: 30 },
+  ],
+  "Communication": [
+    { title: "Give a 5-minute presentation", description: "Present to a club or class.", points: 75 },
+    { title: "Write a cover letter", description: "Tailor it to a real job posting.", points: 50 },
+    { title: "Practice active listening", description: "Attend a workshop or watch a video and reflect.", points: 25 },
+  ],
+  "Critical Thinking": [
+    { title: "Solve a case study", description: "Use logic to recommend a solution.", points: 60 },
+    { title: "Analyze a data set", description: "Find patterns and draw conclusions.", points: 80 },
+    { title: "Write a problem‑solution report", description: "Identify a campus issue and propose a fix.", points: 70 },
+  ],
+  "Equity & Inclusion": [
+    { title: "Attend a DEI workshop", description: "Learn about inclusive practices.", points: 50 },
+    { title: "Volunteer with underserved community", description: "Log 2 hours of service.", points: 100 },
+    { title: "Read about cultural competence", description: "Write a short reflection.", points: 30 },
+  ],
+  "Leadership": [
+    { title: "Lead a group project", description: "Organize roles and deadlines.", points: 80 },
+    { title: "Mentor a peer", description: "Help someone with a skill or class.", points: 60 },
+    { title: "Organize an event", description: "Plan and execute a small gathering.", points: 100 },
+  ],
+  "Professionalism": [
+    { title: "Meet deadlines consistently", description: "Complete 3 assignments on time.", points: 40 },
+    { title: "Dress professionally for an event", description: "Attend a career fair or interview.", points: 30 },
+    { title: "Practice workplace ethics", description: "Complete an online ethics module.", points: 50 },
+  ],
+  "Teamwork": [
+    { title: "Join a club committee", description: "Attend 2 meetings and contribute.", points: 60 },
+    { title: "Complete a team project", description: "Collaborate on a deliverable.", points: 80 },
+    { title: "Resolve a conflict", description: "Mediate or reflect on a team disagreement.", points: 70 },
+  ],
+  "Technology": [
+    { title: "Learn a new software", description: "Complete a tutorial for Excel, Figma, or GitHub.", points: 50 },
+    { title: "Build a simple website", description: "Use a template or code it yourself.", points: 100 },
+    { title: "Complete a cybersecurity training", description: "Penn State offers free modules.", points: 40 },
+  ],
+};

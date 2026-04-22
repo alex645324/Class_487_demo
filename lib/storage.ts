@@ -12,6 +12,7 @@ export interface UserData {
   challengeSelections: string[];
   points: number;
   badges: string[];
+  completedLevels?: number[];  // added for milestone badges
   user?: {
     email: string;
     name: string;
@@ -61,12 +62,30 @@ export function calculatePoints(userData: UserData): number {
   return points;
 }
 
-// Awards users badges based on their completed tasks
+// Awards users badges based on their completed tasks and milestones
 export function getBadges(userData: UserData): string[] {
   const badges: string[] = [];
   if (userData.answers.length > 0) badges.push("🎓 First Quiz");
   if (userData.challengeSelections.length > 0) badges.push("🌍 Explorer");
   if (userData.energyType) badges.push(`⚡ ${userData.energyType}`);
-  console.log("[storage] Badges earned:", badges);
-  return badges;
+
+  // Level completion badges (based on completedLevels array)
+  const completed = userData.completedLevels || [];
+  if (completed.includes(2)) badges.push("🎯 Interests Explorer");
+  if (completed.includes(3)) badges.push("🛠️ Skill Builder");
+  if (completed.includes(4)) badges.push("💪 Strength Finder");
+  if (completed.includes(5)) badges.push("❤️ Value Seeker");
+  if (completed.includes(6)) badges.push("🗺️ Career Visionary");
+
+  // Point milestone badges
+  const points = userData.points || 0;
+  if (points >= 100) badges.push("🏅 100 Points");
+  if (points >= 200) badges.push("🌟 200 Points");
+  if (points >= 300) badges.push("⚡ 300 Points");
+  if (points >= 400) badges.push("🔥 400 Points");
+  if (points >= 500) badges.push("🏆 500 Points");
+  if (points >= 1000) badges.push("💎 1000 Points");
+
+  // Remove duplicates
+  return [...new Set(badges)];
 }

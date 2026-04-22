@@ -14,9 +14,10 @@ interface Props {
 const levels = [
   { level: 1, title: "Discover Your Energy", icon: "⚡" },
   { level: 2, title: "Interests", icon: "🎯" },
-  { level: 3, title: "Strengths", icon: "💪" },
-  { level: 4, title: "Explore Careers", icon: "🗺️" },
-  { level: 5, title: "Real Experiences", icon: "🌟" },
+  { level: 3, title: "Skills", icon: "🛠️" },
+  { level: 4, title: "Strengths", icon: "💪" },
+  { level: 5, title: "Your Values", icon: "❤️" },
+  { level: 6, title: "Explore Careers", icon: "🗺️" },
 ];
 
 export default function QuestMap({ energyType, completedLevels, onStartLevel }: Props) {
@@ -25,43 +26,48 @@ export default function QuestMap({ energyType, completedLevels, onStartLevel }: 
   const maxCompleted = Math.max(...completedLevels);
 
   return (
-    <div className="min-h-dvh bg-white flex flex-col">
-      {/* Header */}
-      <div className="px-6 pt-8 pb-4">
+    <div className="min-h-dvh bg-blue-50 flex flex-col">
+      {/* Header with PSU branding */}
+      <div className="bg-[#1E407C] text-white px-6 py-4 shadow-md flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+            <span className="text-[#1E407C] font-bold text-lg">PSU</span>
+          </div>
+          <h1 className="text-xl font-bold">Quest Map</h1>
+        </div>
+        <HamburgerMenu currentPage="questmap" />
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 px-6 pt-4 pb-8">
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="flex items-center gap-3 mb-4"
+          className="flex items-center gap-3 mb-6"
         >
-          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-2xl">
+          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow">
             {profile.emoji}
           </div>
           <div>
             <p className="text-gray-900 font-bold text-lg">{energyType}</p>
-            <p className="text-gray-400 text-sm">Level {maxCompleted} Complete</p>
+            <p className="text-gray-500 text-sm">Level {maxCompleted} Complete</p>
           </div>
-
-          {/* Dropdown menu button */}
-           <HamburgerMenu currentPage="questmap" />
         </motion.div>
 
         <motion.h1
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="text-2xl font-bold text-gray-900"
+          className="text-2xl font-bold text-gray-900 mb-6"
         >
           Your Quest Map
         </motion.h1>
-      </div>
 
-      {/* Map */}
-      <div className="flex-1 px-6 pb-8 flex flex-col items-center">
-        <div className="w-full max-w-xs space-y-0">
+        <div className="w-full max-w-xs mx-auto space-y-0">
           {levels.map((level, i) => {
             const completed = completedLevels.includes(level.level);
             const unlocked = level.level <= maxCompleted + 1;
-            const tappable = unlocked && !completed && level.level <= 4;
+            const tappable = unlocked && !completed && level.level <= 6;
 
             return (
               <motion.div
@@ -86,7 +92,7 @@ export default function QuestMap({ energyType, completedLevels, onStartLevel }: 
                     completed
                       ? "bg-gray-50 border-2 border-gray-300"
                       : tappable
-                      ? "bg-gray-50 border-2 border-gray-900 active:scale-95"
+                      ? "bg-white border-2 border-[#1E407C] active:scale-95 shadow"
                       : unlocked
                       ? "bg-gray-50 border-2 border-gray-200"
                       : "bg-gray-50 border-2 border-gray-100"
@@ -97,7 +103,7 @@ export default function QuestMap({ energyType, completedLevels, onStartLevel }: 
                       completed
                         ? "bg-white shadow-lg border border-gray-200"
                         : tappable
-                        ? "bg-gray-900"
+                        ? "bg-[#1E407C]"
                         : unlocked
                         ? "bg-gray-100"
                         : "bg-gray-50"
@@ -106,7 +112,7 @@ export default function QuestMap({ energyType, completedLevels, onStartLevel }: 
                     {completed ? (
                       <span>✅</span>
                     ) : tappable ? (
-                      <span>{level.icon}</span>
+                      <span className="text-white">{level.icon}</span>
                     ) : unlocked ? (
                       <span>{level.icon}</span>
                     ) : (
@@ -130,7 +136,7 @@ export default function QuestMap({ energyType, completedLevels, onStartLevel }: 
                       {level.title}
                     </p>
                     {tappable && (
-                      <p className="text-xs text-gray-500 mt-0.5">Tap to start →</p>
+                      <p className="text-xs text-[#1E407C] mt-0.5">Tap to start →</p>
                     )}
                   </div>
 
@@ -140,16 +146,17 @@ export default function QuestMap({ energyType, completedLevels, onStartLevel }: 
             );
           })}
         </div>
-        {/* Back to Home page button */}
+
         <div className="mt-8 text-center">
-        <button
+          <button
             onClick={() => router.push("/student/home")}
-            className="text-[#1E407C] underline text-sm"
-        >
-          Back to Home Page
-        </button>
-      </div>
-        {maxCompleted < 4 && (
+            className="text-[#1E407C] underline text-sm hover:text-[#0F2B55]"
+          >
+            Back to Home Page
+          </button>
+        </div>
+
+        {maxCompleted < 6 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -157,7 +164,7 @@ export default function QuestMap({ energyType, completedLevels, onStartLevel }: 
             className="mt-8 text-center"
           >
             <p className="text-gray-400 text-sm">More levels coming soon...</p>
-            <p className="text-gray-300 text-xs mt-1">Real Experiences</p>
+            <p className="text-gray-300 text-xs mt-1">Complete all levels to unlock more</p>
           </motion.div>
         )}
       </div>

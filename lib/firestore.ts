@@ -22,6 +22,10 @@ export interface UserData {
   name?: string;
   year?: string;
   major?: string;
+  naceCompetencies: string[];
+  values: string[];
+  graduationYear?: string;
+  completedQuests: string[];
 }
 
 const DEFAULT_USER_DATA: UserData = {
@@ -38,6 +42,11 @@ const DEFAULT_USER_DATA: UserData = {
   name: "",
   year: "",
   major: "",
+  naceCompetencies: [],
+  values: [],
+  graduationYear: "",
+  completedQuests: [],
+
 };
 
 export async function initializeUserWithRole(user: User, selectedRole?: "student" | "counselor" | "admin"): Promise<{ role: string }> {

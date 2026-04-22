@@ -45,12 +45,10 @@ export default function ResumePage() {
 
     setUploading(true);
     try {
-      // Uploads submitted file (supposed to be ur resume) to storage
       const storageRef = ref(storage, `resumes/${user.uid}/${file.name}`);
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
 
-      // Saves the URL in firestore database
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, { resumeUrl: downloadURL });
 
@@ -69,55 +67,63 @@ export default function ResumePage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-dvh bg-white p-6 max-w-md mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Resume Upload & Review</h1>
+    <div className="min-h-dvh bg-blue-50">
+      {/* Header */}
+      <div className="bg-[#1E407C] text-white px-6 py-4 shadow-md flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+            <span className="text-[#1E407C] font-bold text-lg">PSU</span>
+          </div>
+          <h1 className="text-xl font-bold">Resume Upload & Review</h1>
+        </div>
         <HamburgerMenu currentPage="resume" />
       </div>
 
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Upload a New Resume</h2>
-        <input
-          type="file"
-          accept=".pdf,.doc,.docx"
-          onChange={handleFileChange}
-          className="w-full p-2 border border-gray-200 rounded-xl"
-        />
-        <button
-          onClick={handleUpload}
-          disabled={!file || uploading}
-          className="mt-2 w-full bg-gray-900 text-white p-3 rounded-xl font-bold disabled:opacity-50"
-        >
-          {uploading ? "Uploading..." : "Upload"}
-        </button>
-        {message && <p className="text-sm text-center text-green-600 mt-2">{message}</p>}
-      </div>
-
-      {currentResumeUrl && (
+      <div className="p-6 max-w-md mx-auto">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-2">Current Resume</h2>
-          <a
-            href={currentResumeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 underline"
+          <h2 className="text-lg font-semibold mb-2">Upload a New Resume</h2>
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx"
+            onChange={handleFileChange}
+            className="w-full p-2 border border-gray-200 rounded-xl bg-white"
+          />
+          <button
+            onClick={handleUpload}
+            disabled={!file || uploading}
+            className="mt-2 w-full bg-[#1E407C] text-white p-3 rounded-xl font-bold disabled:opacity-50 hover:bg-[#0F2B55] transition"
           >
-            View/Download
-          </a>
+            {uploading ? "Uploading..." : "Upload"}
+          </button>
+          {message && <p className="text-sm text-center text-green-600 mt-2">{message}</p>}
         </div>
-      )}
 
-      {feedback && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-          <h2 className="text-lg font-semibold mb-2">Counselor Feedback</h2>
-          <p className="text-gray-700">{feedback}</p>
+        {currentResumeUrl && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-2">Current Resume</h2>
+            <a
+              href={currentResumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline"
+            >
+              View/Download
+            </a>
+          </div>
+        )}
+
+        {feedback && (
+          <div className="mb-6 p-4 bg-white rounded-xl shadow-sm">
+            <h2 className="text-lg font-semibold mb-2">Counselor Feedback</h2>
+            <p className="text-gray-700">{feedback}</p>
+          </div>
+        )}
+
+        <div className="mt-6 text-center">
+          <button onClick={() => router.push("/student/home")} className="text-gray-600 underline hover:text-[#1E407C]">
+            Back to Home Page
+          </button>
         </div>
-      )}
-
-      <div className="mt-6 text-center">
-        <button onClick={() => router.push("/student/home")} className="text-gray-500 underline">
-          Back to Home Page
-        </button>
       </div>
     </div>
   );

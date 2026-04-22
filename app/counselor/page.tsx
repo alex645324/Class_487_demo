@@ -191,20 +191,28 @@ export default function CounselorPage() {
         <p className="text-blue-100 text-sm mt-2">Career & Professional Development</p>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs with Messages button */}
       <div className="border-b border-gray-200 bg-white px-6">
-        <div className="flex gap-4">
-          {(["student", "counselor", "admin"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`py-3 px-2 font-medium text-sm transition-colors ${
-                activeTab === tab ? "border-b-2 border-[#1E407C] text-[#1E407C]" : "text-gray-500"
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}s
-            </button>
-          ))}
+        <div className="flex justify-between items-center">
+          <div className="flex gap-4">
+            {(["student", "counselor", "admin"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`py-3 px-2 font-medium text-sm transition-colors ${
+                  activeTab === tab ? "border-b-2 border-[#1E407C] text-[#1E407C]" : "text-gray-500"
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}s
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => router.push("/counselor/messages")}
+            className="flex items-center gap-1 text-gray-600 hover:text-[#1E407C] transition-colors py-2 px-3 text-sm font-medium"
+          >
+            <span>📧</span> Messages
+          </button>
         </div>
       </div>
 

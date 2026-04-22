@@ -9,14 +9,22 @@ export default function Home() {
   const { user, loading } = userAuth();
   const router = useRouter();
 
-  // If already logged in, read their saved role and redirect
   useEffect(() => {
     if (!loading && user) {
       getUserData(user).then((data) => {
         const role = data.role || "student";
-        if (role === "counselor") router.push("/counselor");
-        else if (role === "admin") router.push("/admin");
-        else router.push("/student/home");
+        // For students: check if they have a name
+        if (role === "student") {
+          if (!data.name || data.name.trim() === "" || data.name === "Not set") {
+            router.replace("/student/onboarding");
+          } else {
+            router.replace("/student/home");
+          }
+        } else if (role === "counselor") {
+          router.replace("/counselor");
+        } else if (role === "admin") {
+          router.replace("/admin");
+        }
       });
     }
   }, [user, loading, router]);

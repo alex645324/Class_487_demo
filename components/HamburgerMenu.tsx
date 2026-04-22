@@ -5,7 +5,8 @@ import { auth } from "@/lib/firebase";
 import { useState, useRef, useEffect } from "react";
 
 interface Props {
-  currentPage?: "home" | "achievements" | "activities" | "resume" | "events" | "messages" | "questmap"|"feed";
+  currentPage?: "home" | "achievements" | "activities" | "resume" | "events" | "messages" | "questmap"|"feed"
+  | "roadmap" | "all-quests" | "all-badges";
 }
 
 export default function HamburgerMenu({ currentPage }: Props) {
@@ -37,6 +38,9 @@ export default function HamburgerMenu({ currentPage }: Props) {
     { id: "events", label: "Events", icon: "📅", path: "/student/events" },
     { id: "messages", label: "Messages", icon: "💬", path: "/student/messages" },
     { id: "feed", label: "Social Feed", icon: "👥", path: "/student/feed" },
+    { id: "roadmap", label: "Career Roadmap", icon: "🗺️", path: "/student/roadmap" },
+    { id: "all-quests", label: "All Quests", icon: "📋", path: "/student/all-quests" },
+    { id: "all-badges", label: "All Badges", icon: "🏅", path: "/student/all-badges" },
   ];
 
   return (

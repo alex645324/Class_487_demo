@@ -31,40 +31,43 @@ export default function LoginScreen() {
     setError("");
     setIsLoading(true);
 
-    if (!email.endsWith("@psu.edu")) {
-      setError("Please use your Penn State email (@psu.edu)");
-      setIsLoading(false);
-      return;
+    const normalizedEmail = email.toLowerCase();
+
+    if (!normalizedEmail.endsWith("@psu.edu")) {
+        setError("Please use your Penn State email (@psu.edu)");
+        setIsLoading(false);
+        return;
     }
     if (!password) {
-      setError("Please enter your password");
-      setIsLoading(false);
-      return;
+        setError("Please enter your password");
+        setIsLoading(false);
+        return;
     }
 
     try {
-      // Try to create a new user first
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await initializeUserWithRole(userCredential.user, selectedRole);
-      redirectByRole(selectedRole);
-    } catch (err: any) {
+        const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
+        await initializeUserWithRole(userCredential.user, selectedRole);
+        redirectByRole(selectedRole);
+        } catch (err: any) {
+
       if (err.code === "auth/email-already-in-use") {
-        try {
-          const userCredential = await signInWithEmailAndPassword(auth, email, password);
-          await initializeUserWithRole(userCredential.user, selectedRole);
-          redirectByRole(selectedRole);
-        } catch (signInErr: any) {
-          console.error("[Login] Sign in error:", signInErr);
-          setError("Invalid password. Please try again.");
-        }
-      } else {
-        console.error("[Login] Creation error:", err);
-        setError(err.message);
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, normalizedEmail, password);
+                await initializeUserWithRole(userCredential.user, selectedRole);
+                redirectByRole(selectedRole);
+          } catch (signInErr: any) {
+            console.error("[Login] Sign in error:", signInErr);
+            setError("Invalid password. Please try again.");
       }
-    } finally {
-      setIsLoading(false);
+
+   } else {
+      console.error("[Login] Creation error:", err);
+      setError(err.message);
     }
-  };
+  } finally {
+        setIsLoading(false);
+  }
+};
 
   // Mock SSO button – simulates how redirecting to Penn State's sso would work
   const handleSSORedirect = () => {
